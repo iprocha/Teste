@@ -33,15 +33,23 @@ public class ConnectionFactory {
         }
     }
 	
+	//Metodo para testar conexao com o banco. Cria-se uma conexao com os valores passados e fecha-se logo em seguida.
 	public static boolean testConnection(String server, String schema, String user, String password){
+		Connection test = null;
 		try {
-			Connection test = DriverManager.getConnection(
+			test = DriverManager.getConnection(
           "jdbc:mysql://"+server+"/"+schema+"?allowMultiQueries=true", user, password);
 			
-			test.close();
+			
         } catch (SQLException e) {
         	System.out.println(e);
         	return false;
+        }finally{
+        	try{
+        	test.close();
+        	}catch (SQLException sqle){
+        		System.out.println(sqle);
+        	}
         }
 		return true;
 	}
@@ -51,11 +59,13 @@ public class ConnectionFactory {
 		//Caso o dominio nao exista no banco, o valor retornado eh 0 zero.
 		public static int validateDomain(String server, String schema, String user, String password, String domain){
 			int numResearchers = 0;
+			Connection con = null;
+			PreparedStatement statement = null;
 			try{
-			Connection con = new ConnectionFactory(server, user, schema, password).getConnection();
+			con = new ConnectionFactory(server, user, schema, password).getConnection();
 			String sql = "Select COUNT(*) as numPesquisadores FROM im_lattes.pesquisador where pesquisador.INFO = ?";
 			
-			PreparedStatement statement = con.prepareStatement(sql);
+			statement = con.prepareStatement(sql);
 			statement.setString(1, domain);
 			
 			ResultSet rs = statement.executeQuery();
@@ -64,6 +74,13 @@ public class ConnectionFactory {
 			}
 			 }catch(SQLException e){
 				 System.out.println(e);
+			 }finally{
+				 try{
+				 con.close();
+				 statement.close();
+				 }catch(SQLException sqle){
+					 System.out.println(sqle);
+				 }
 			 }
 			return (numResearchers);
 			

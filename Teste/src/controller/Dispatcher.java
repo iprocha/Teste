@@ -12,6 +12,8 @@ import javax.swing.JOptionPane;
 
 
 
+import javax.swing.SwingUtilities;
+
 import pivot.Pivot;
 import view.ProcessWindow;
 import view.SetUpWindow;
@@ -33,7 +35,7 @@ public class Dispatcher {
 	
 	
 	//Executar o processamento todo.
-	public static boolean execute(String server, String schema, String user, String password, String domain, int kNumber) {
+	 public static boolean execute(String server, String schema, String user, String password, String domain, int kNumber) {
 		
 //		String server = "localhost";
 //		String user = "desenvolvimento";
@@ -44,15 +46,13 @@ public class Dispatcher {
 		Statement statement = null;
 		int processNumber = 0;
 		
-		ProcessWindow frame = new ProcessWindow();
-		frame.setVisible(true);
+		
 		
 		//Pegando conexão com o banco.
 				Connection con = new ConnectionFactory(server, user, schema, password).getConnection();
 				RPMExecution rmpProcess = new RPMExecution(server,schema,password, domain, user);
 				
 				
-
 				
 				try{
 				statement = con.createStatement();
@@ -67,6 +67,8 @@ public class Dispatcher {
 				  	caso1.createSQL01();			
 					statement.execute(caso1.SQL_TAB01);
 					System.out.println("INFO: Tabela 01 criada. ");
+				
+				
 				  
 					//Roda o processo rmp tab02
 					System.out.println("INFO: Tabela 02 ");
@@ -96,6 +98,12 @@ public class Dispatcher {
 					statement.executeUpdate(caso1.SQL_TAB05A09);
 					System.out.println("INFO: Tabelas 05 a 09 criadas. ");
 					
+					statement.close();
+				    con.close();
+				    
+				    con = new ConnectionFactory(server, user, schema, password).getConnection();
+				    statement = con.createStatement();
+				    
 					//Inicia o processo RapidMiner da tabela 10.01 e tabela 10.02
 					System.out.println("INFO: Tabelas 10.01 e 10.02 ");
 					rpmPath = "public/tab10s.rmp";
@@ -164,21 +172,46 @@ public class Dispatcher {
 				}
 		return true;
 	}
+	 
+//	 public static ProcessWindow openWindow(){
+//		 ProcessWindow frame = new ProcessWindow();
+////			frame.setVisible(true);
+//			frame.lblNewLabel_1.setText("Testando");
+//			return frame;
+//	 }
 	
 	
-	
-
-	public static void main(String[] args) throws SQLException, Exception { 
+	public static void executeWindow(String server, String schema, String user, String password, String domain, int kNumber){
+//		SwingUtilities.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					ProcessWindow frame = new ProcessWindow();
+//					frame.setVisible(true);
+//					
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+		//openWindow();
+		
+		execute(server, schema, user, password, domain, kNumber);
 		
 		
-		SetUpWindow frame = new SetUpWindow();
-		frame.setVisible(true);
-		
-		System.out.print("teste");
 		
 		
-		
-	
 	}
+
+
+//	 public static void main(String[] args)  throws Exception {
+//	        SwingUtilities.invokeLater(new Runnable() {
+//			public void run() {
+//				SetUpWindow frame = new SetUpWindow();
+//				frame.setVisible(true);
+////				ProcessWindow frame2  = new ProcessWindow();
+////				frame2.setVisible(true);
+//			}
+//		});
+//	}
 
 }

@@ -72,7 +72,7 @@
           </operator>
           <operator activated="true" class="text:filter_stopwords_english" compatibility="5.3.000" expanded="true" height="60" name="Filter Stopwords (English)" width="90" x="246" y="75"/>
           <operator activated="true" class="text:filter_stopwords_dictionary" compatibility="5.3.000" expanded="true" height="76" name="Filter Stopwords (Dictionary)" width="90" x="380" y="75">
-            <parameter key="file" value="C:\Users\igor.rocha\workspace\Teste\public\stopwords-pt.txt"/>
+            <parameter key="file" value="/stopwords-pt.txt"/>
             <parameter key="case_sensitive" value="false"/>
             <parameter key="encoding" value="SYSTEM"/>
           </operator>
