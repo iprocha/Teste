@@ -1,3 +1,20 @@
+/*
+ * Data:
+ * Dezembro de 2013
+ * 
+ * Descricao:
+ * Programa de integracao de processos do Programa Rapid Miner, que compoem as etapas para a 
+ * geracao de resultados de similaridades e agrupamentos entre pesquisadores em determinado dominio.
+ * 
+ * Creditos:
+ * Processos Rapid Miner e processamentos de rotina SQL. 
+ * Romualdo Alves Pereira Júnior - romualdoalves@gmail.com
+ * 
+ * Programa de integracao dos processos e  elaboracao de interface grafica.
+ * Igor Pessoa Rocha - iprocha@gmail.com
+ * 
+ */
+
 package controller;
 
 public class SQLs {
@@ -34,17 +51,17 @@ public class SQLs {
 	
 	//Cria todo o código SQL e DDL para cada tabela chamada e armazena nas costantes
 	public void createSQL01(){
-		SQL_TAB01 = "DROP TABLE IF EXISTS im_lattes.iae_tab01; "
-				  +" CREATE TABLE "+ schema + "."+ domain1 +"_tab01 ("
+		SQL_TAB01 = "DROP TABLE IF EXISTS "+ schema + "."+ domain +"_tab01; "
+				  +" CREATE TABLE "+ schema + "."+ domain +"_tab01 ("
 		  		  +"`id_pesquisador` INT(11) NOT NULL,"
 		  		  +"`id_tipo_producao_cientifica` VARCHAR(1) NOT NULL,"
 		  		  +"`id_producao_cientifica` INT(11) NOT NULL,"
 		  		  +"`titulo` MEDIUMTEXT,"
 		  		  +" PRIMARY KEY (`id_pesquisador`, `id_tipo_producao_cientifica`, `id_producao_cientifica`));"
-		  		  +" INSERT " + schema + "." + domain1 + "_tab01 " 
+		  		  +" INSERT " + schema + "." + domain + "_tab01 " 
 		  		  +" SELECT B.PESQUISADOR_ID AS id_pesquisador, B.ContributionType AS id_tipo_producao_cientifica, B.ID AS id_producao_cientifica, TITULO AS titulo "  
 		  		  +" FROM "+schema+".pesquisador A, "+schema+".basecontribution B "
-		  		  +" WHERE A.INFO = '" + domain1 + "' AND A.ID = B.PESQUISADOR_ID "
+		  		  +" WHERE A.INFO = '" + domain + "' AND A.ID = B.PESQUISADOR_ID "
 		  		  +" ORDER BY id_pesquisador;";
 		  	
 		

@@ -1,3 +1,20 @@
+/*
+ * Data:
+ * Dezembro de 2013
+ * 
+ * Descricao:
+ * Programa de integracao de processos do Programa Rapid Miner, que compoem as etapas para a 
+ * geracao de resultados de similaridades e agrupamentos entre pesquisadores em determinado dominio.
+ * 
+ * Creditos:
+ * Processos Rapid Miner e processamentos de rotina SQL. 
+ * Romualdo Alves Pereira Júnior - romualdoalves@gmail.com
+ * 
+ * Programa de integracao dos processos e  elaboracao de interface grafica.
+ * Igor Pessoa Rocha - iprocha@gmail.com
+ * 
+ */
+
 package view;
 
 import java.awt.BorderLayout;
@@ -17,6 +34,8 @@ import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -29,6 +48,12 @@ import controller.SQLs;
 
 import javax.swing.JProgressBar;
 
+import oracle.sql.DATE;
+
+import java.util.Date;
+import org.eclipse.wb.swing.FocusTraversalOnArray;
+import java.awt.Component;
+import javax.swing.JSeparator;
 public class ProcessWindow extends JFrame {
 
 	private JPanel contentPane;
@@ -44,6 +69,25 @@ public class ProcessWindow extends JFrame {
 	public JLabel lblNewLabel_9;
 	public JLabel lblNewLabel_10;
 	private JLabel lblNewLabel_11;
+	private JLabel lblNewLabel_13;
+	private JLabel lblNewLabel_14;
+	
+	private JLabel lblNewLabelTS_1;
+	private JLabel lblNewLabelTS_2;
+	private JLabel lblNewLabelTS_3;
+	private JLabel lblNewLabelTS_4;
+	private JLabel lblNewLabelTS_5;
+	private JLabel lblNewLabelTS_6;
+	private JLabel lblNewLabelTS_7;
+	private JLabel lblNewLabelTS_8;
+	private JLabel lblNewLabelTS_9;
+	private JLabel lblNewLabelTS_10;
+	private JLabel lblNewLabelTS_11;
+	private JLabel lblNewLabelTS_12;
+	private JLabel lblNewLabelTS_13;
+	
+	private JLabel lblLabelDominio;
+	private JLabel lblLabelNumPesquisadores;
 	
 	private String server; 
 	private String schema; 
@@ -51,10 +95,12 @@ public class ProcessWindow extends JFrame {
 	private String password; 
 	private String domain; 
 	private int kNumber;
+	private int numResearchers;
 	private JProgressBar progressBar;
 	private JLabel lblNewLabel_12;
-	
-
+	private JButton btnNewButton;
+	private int pruneBelow;
+	private int pruneAbove;
 
 	/**
 	 * Launch the application.
@@ -75,7 +121,7 @@ public class ProcessWindow extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public ProcessWindow(String serverArg, String schemaArg, String userArg, String passwordArg, String domainArg, int kNumberArg) {
+	public ProcessWindow(String serverArg, String schemaArg, String userArg, String passwordArg, String domainArg, int kNumberArg, int numResearchersArg, int pruneBelowArg, int pruneAboveArg) {
 		setTitle("Processer");
 		
 		this.server = serverArg;
@@ -84,10 +130,13 @@ public class ProcessWindow extends JFrame {
 		this.password = passwordArg;
 		this.domain = domainArg;
 		this.kNumber = kNumberArg;
+		this.numResearchers = numResearchersArg;
+		this.pruneAbove = pruneAboveArg;
+		this.pruneBelow = pruneBelowArg;
 		
-		
-		setBounds(100, 100, 571, 446);
+		setBounds(100, 100, 629, 564);
 		contentPane = new JPanel();
+		contentPane.setForeground(new Color(0, 0, 0));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
@@ -95,60 +144,61 @@ public class ProcessWindow extends JFrame {
 		lblNewLabel_0 = new JLabel("Status do Processamento");
 		lblNewLabel_0.setFont(new Font("Tahoma", Font.BOLD, 13));
 		lblNewLabel_0.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel_0.setBounds(10, 11, 471, 14);
+		lblNewLabel_0.setBounds(10, 11, 583, 14);
 		contentPane.add(lblNewLabel_0);
 		
 		lblNewLabel_1 = new JLabel("");
-		lblNewLabel_1.setBounds(10, 36, 471, 14);
+		lblNewLabel_1.setBounds(10, 102, 176, 14);
 		contentPane.add(lblNewLabel_1);
 		
 		lblNewLabel_2 = new JLabel("");
-		lblNewLabel_2.setBounds(10, 61, 471, 14);
+		lblNewLabel_2.setBounds(10, 127, 176, 14);
 		contentPane.add(lblNewLabel_2);
 		
 		lblNewLabel_3 = new JLabel("");
-		lblNewLabel_3.setBounds(10, 86, 471, 14);
+		lblNewLabel_3.setBounds(10, 152, 176, 14);
 		contentPane.add(lblNewLabel_3);
 		
 		lblNewLabel_4 = new JLabel("");
-		lblNewLabel_4.setBounds(10, 111, 486, 14);
+		lblNewLabel_4.setBounds(10, 177, 176, 14);
 		contentPane.add(lblNewLabel_4);
 		
 		lblNewLabel_5 = new JLabel("");
-		lblNewLabel_5.setBounds(10, 136, 471, 14);
+		lblNewLabel_5.setBounds(10, 202, 176, 14);
 		contentPane.add(lblNewLabel_5);
 		
 		lblNewLabel_6 = new JLabel("");
-		lblNewLabel_6.setBounds(10, 161, 471, 14);
+		lblNewLabel_6.setBounds(10, 227, 176, 14);
 		contentPane.add(lblNewLabel_6);
 		
 		lblNewLabel_7 = new JLabel("");
-		lblNewLabel_7.setBounds(10, 186, 471, 14);
+		lblNewLabel_7.setBounds(10, 252, 176, 14);
 		contentPane.add(lblNewLabel_7);
 		
 		lblNewLabel_8 = new JLabel("");
-		lblNewLabel_8.setBounds(10, 211, 471, 14);
+		lblNewLabel_8.setBounds(10, 277, 176, 14);
 		contentPane.add(lblNewLabel_8);
 		
 		lblNewLabel_9 = new JLabel("");
-		lblNewLabel_9.setBounds(10, 236, 471, 14);
+		lblNewLabel_9.setBounds(10, 302, 176, 14);
 		contentPane.add(lblNewLabel_9);
 		
 		lblNewLabel_10 = new JLabel("");
-		lblNewLabel_10.setBounds(10, 261, 192, 14);
+		lblNewLabel_10.setBounds(10, 327, 176, 14);
 		contentPane.add(lblNewLabel_10);
 		
-		JButton btnNewButton = new JButton("Executar");
+		
+		btnNewButton = new JButton("Executar");
 		btnNewButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				
+				btnNewButton.setEnabled(false);
 				
 				SwingWorker<Boolean, Integer> worker = new SwingWorker<Boolean, Integer>() {
 					   @Override
 					   protected Boolean doInBackground() throws Exception {
 						   
-						 
+						   
 						   
 							String port = "3306";
 							Statement statement = null;
@@ -185,7 +235,7 @@ public class ProcessWindow extends JFrame {
 										publish(3);
 									  	processNumber = 2;
 										rpmPath = "public/tab02s.rmp";
-										rmpProcess.run(rpmPath,processNumber,kNumber);
+										rmpProcess.run(rpmPath,processNumber,kNumber, pruneAbove, pruneBelow);
 										System.out.println("INFO: Tabela 02 criada. ");
 										publish(4);
 										
@@ -204,7 +254,7 @@ public class ProcessWindow extends JFrame {
 										publish(7);
 										rpmPath = "public/tab04s.rmp";
 										processNumber = 4;
-										rmpProcess.run(rpmPath, processNumber, kNumber);
+										rmpProcess.run(rpmPath, processNumber, kNumber, pruneAbove, pruneBelow);
 										System.out.println("INFO: Tabela 04 criada. ");
 										publish(8);
 									
@@ -223,7 +273,7 @@ public class ProcessWindow extends JFrame {
 										publish(11);
 										rpmPath = "public/tab10s.rmp";
 										processNumber = 10;
-										rmpProcess.run(rpmPath, processNumber, kNumber);
+										rmpProcess.run(rpmPath, processNumber, kNumber, pruneAbove, pruneBelow);
 										System.out.println("INFO: Tabelas 10.01 e 10.02 criadas. ");
 										publish(12);
 									
@@ -241,7 +291,7 @@ public class ProcessWindow extends JFrame {
 										publish(15);
 										rpmPath = "public/tab13s.rmp";
 										processNumber = 13;
-										rmpProcess.run(rpmPath, processNumber, kNumber);
+										rmpProcess.run(rpmPath, processNumber, kNumber, pruneAbove, pruneBelow);
 										System.out.println("INFO: Tabela 13 criada. ");
 										publish(16);
 										
@@ -279,22 +329,40 @@ public class ProcessWindow extends JFrame {
 									    System.out.println("INFO: Tabela 16 criada. ");
 									    publish(22);
 									    
+									  //Inicia o processo RapidMiner que gera a tabela gephi_nodes
+									    System.out.println("INFO: Tabela gephi_nodes ");
+										publish(23);
+										rpmPath = "public/gephi_nodes_s.rmp";
+										processNumber = 14;
+										rmpProcess.run(rpmPath, processNumber, kNumber, pruneAbove, pruneBelow);
+										System.out.println("INFO: Tabela gephi_nodes criada. ");
+										publish(24);
 									    
-									    
+										 //Inicia o processo RapidMiner que gera a tabela gephi_edges
+									    System.out.println("INFO: Tabela gephi_edges ");
+										publish(25);
+										rpmPath = "public/gephi_edges_s.rmp";
+										processNumber = 15;
+										rmpProcess.run(rpmPath, processNumber, kNumber, pruneAbove, pruneBelow);
+										System.out.println("INFO: Tabela gephi_edges criada. ");
+										publish(26);
 									    
 									    System.out.println("INFO: Processamento finalizado com sucesso!");
 									    publish(0);
 									}catch(SQLException sqle){
-										System.out.println(sqle);
+										lblNewLabel_12.setForeground(Color.red);
+										lblNewLabel_12.setText(sqle.toString());
 									}catch(Exception e){
-										System.out.println(e);
+										lblNewLabel_12.setForeground(Color.red);
+										lblNewLabel_12.setText(e.toString());
 									}finally{
 										//Fechando conexão
 									    try{
 											statement.close();
 										    con.close();
 									    }catch(SQLException sqle2){
-									    	System.out.println(sqle2);
+									    	lblNewLabel_12.setForeground(Color.red);
+											lblNewLabel_12.setText(sqle2.toString());
 									    }
 									}
 					     // The type we pass to publish() is determined
@@ -312,9 +380,10 @@ public class ProcessWindow extends JFrame {
 					    
 					    boolean status;
 					    try {
+							
 					     // Retrieve the return value of doInBackground.
 					     status = get();
-					     lblNewLabel_0.setText("Completed with status: " + status);
+					     //lblNewLabel_0.setText("Completed with status: " + status);
 					    } catch (InterruptedException e) {
 					     // This is thrown if the thread's interrupted.
 					    } catch (ExecutionException e) {
@@ -326,10 +395,9 @@ public class ProcessWindow extends JFrame {
 					   @Override
 					   // Can safely update the GUI from this method.
 					   protected void process(List<Integer> chunks) {
-					    // Here we receive the values that we publish().
-					    // They may come grouped in chunks.
-						   
-						   //Laco que percorre todo a lista de inteiros. Algumas vezes os valores vem agrupados.
+						   //Todo valor do publish() cai aqui nesse metodo process()
+						   //Laco que percorre todo a lista de inteiros. 
+						   //Algumas vezes os valores vem agrupados, por isso a necessidade de percorrer toda a lista sempre .
 						   int init = 0;
 						   while(init < chunks.size()){
 							   
@@ -346,24 +414,121 @@ public class ProcessWindow extends JFrame {
 					  worker.execute();
 			}
 		});
-		btnNewButton.setBounds(231, 362, 89, 23);
+		btnNewButton.setBounds(256, 477, 89, 23);
 		contentPane.add(btnNewButton);
 		
 		progressBar = new JProgressBar();
-		progressBar.setBounds(202, 337, 146, 14);
+		progressBar.setBounds(232, 452, 146, 14);
 		contentPane.add(progressBar);
 		
 		lblNewLabel_11 = new JLabel("");
-		lblNewLabel_11.setBounds(10, 286, 486, 14);
+		lblNewLabel_11.setBounds(10, 352, 176, 14);
 		contentPane.add(lblNewLabel_11);
 		
 		lblNewLabel_12 = new JLabel("Iniciar Processamento");
 		lblNewLabel_12.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel_12.setBounds(154, 312, 246, 14);
+		lblNewLabel_12.setBounds(10, 427, 583, 14);
 		contentPane.add(lblNewLabel_12);
+		
+		lblNewLabel_13 = new JLabel("");
+		lblNewLabel_13.setBounds(10, 377, 176, 14);
+		contentPane.add(lblNewLabel_13);
+		
+		lblNewLabel_14 = new JLabel("");
+		lblNewLabel_14.setBounds(10, 402, 176, 14);
+		contentPane.add(lblNewLabel_14);
+		
+		lblNewLabelTS_1 = new JLabel("");
+		lblNewLabelTS_1.setBounds(196, 102, 182, 14);
+		contentPane.add(lblNewLabelTS_1);
+		
+		lblNewLabelTS_2 = new JLabel("");
+		lblNewLabelTS_2.setBounds(196, 127, 182, 14);
+		contentPane.add(lblNewLabelTS_2);
+		
+		lblNewLabelTS_3 = new JLabel("");
+		lblNewLabelTS_3.setBounds(196, 152, 182, 14);
+		contentPane.add(lblNewLabelTS_3);
+		
+		lblNewLabelTS_4 = new JLabel("");
+		lblNewLabelTS_4.setBounds(196, 177, 182, 14);
+		contentPane.add(lblNewLabelTS_4);
+		
+		lblNewLabelTS_5 = new JLabel("");
+		lblNewLabelTS_5.setBounds(196, 202, 182, 14);
+		contentPane.add(lblNewLabelTS_5);
+		
+		lblNewLabelTS_6 = new JLabel("");
+		lblNewLabelTS_6.setBounds(196, 227, 182, 14);
+		contentPane.add(lblNewLabelTS_6);
+		
+		lblNewLabelTS_7 = new JLabel("");
+		lblNewLabelTS_7.setBounds(196, 252, 182, 14);
+		contentPane.add(lblNewLabelTS_7);
+		
+		lblNewLabelTS_8 = new JLabel("");
+		lblNewLabelTS_8.setBounds(196, 277, 182, 14);
+		contentPane.add(lblNewLabelTS_8);
+		
+		lblNewLabelTS_9 = new JLabel("");
+		lblNewLabelTS_9.setBounds(196, 302, 182, 14);
+		contentPane.add(lblNewLabelTS_9);
+		
+		lblNewLabelTS_10 = new JLabel("");
+		lblNewLabelTS_10.setBounds(196, 327, 182, 14);
+		contentPane.add(lblNewLabelTS_10);
+		
+		lblNewLabelTS_11 = new JLabel("");
+		lblNewLabelTS_11.setBounds(196, 352, 182, 14);
+		contentPane.add(lblNewLabelTS_11);
+		
+		lblNewLabelTS_12 = new JLabel("");
+		lblNewLabelTS_12.setBounds(196, 377, 182, 14);
+		contentPane.add(lblNewLabelTS_12);
+		
+		lblNewLabelTS_13 = new JLabel("");
+		lblNewLabelTS_13.setBounds(196, 401, 182, 14);
+		contentPane.add(lblNewLabelTS_13);
+		
+		JLabel lblNewLabel = new JLabel("Dom\u00EDnio:");
+		lblNewLabel.setForeground(Color.BLACK);
+		lblNewLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblNewLabel.setBounds(10, 36, 176, 14);
+		contentPane.add(lblNewLabel);
+		
+		lblLabelDominio = new JLabel("Iae");
+		lblLabelDominio.setForeground(Color.BLUE);
+		lblLabelDominio.setBounds(196, 36, 190, 14);
+		contentPane.add(lblLabelDominio);
+		
+		
+		JLabel lblNmeroDePesquisadores = new JLabel("N\u00FAmero de Pesquisadores:");
+		lblNmeroDePesquisadores.setForeground(Color.BLACK);
+		lblNmeroDePesquisadores.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblNmeroDePesquisadores.setBounds(10, 61, 176, 14);
+		contentPane.add(lblNmeroDePesquisadores);
+		
+		lblLabelNumPesquisadores = new JLabel("256");
+		lblLabelNumPesquisadores.setForeground(Color.BLUE);
+		lblLabelNumPesquisadores.setBounds(196, 61, 199, 14);
+		contentPane.add(lblLabelNumPesquisadores);
+		contentPane.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{btnNewButton, lblNewLabel_0, lblNewLabel_1, lblNewLabel_2, lblNewLabel_3, lblNewLabel_4, lblNewLabel_5, lblNewLabel_6, lblNewLabel_7, lblNewLabel_8, lblNewLabel_9, lblNewLabel_10, progressBar, lblNewLabel_11, lblNewLabel_12, lblNewLabel_13, lblNewLabel_14, lblNewLabelTS_1, lblNewLabelTS_2, lblNewLabelTS_3, lblNewLabelTS_4, lblNewLabelTS_5, lblNewLabelTS_6, lblNewLabelTS_7, lblNewLabelTS_8, lblNewLabelTS_9, lblNewLabelTS_10, lblNewLabelTS_11, lblNewLabelTS_12, lblNewLabelTS_13}));
+		
+		lblLabelDominio.setText(String.valueOf(domainArg));
+		lblLabelNumPesquisadores.setText(String.valueOf(numResearchersArg));
+		
+		JSeparator separator = new JSeparator();
+		separator.setBounds(20, 86, 546, 2);
+		contentPane.add(separator);
+	
 	}
 	
+	
+	//Switch que identifica qual parte do processamento está sendo executada e
+	//seta as devidas mensagens que aparecerão na tela de Status do Processamento.
 	private void switchMessage(int value){
+		Date date = new Date();
+		SimpleDateFormat ft = new SimpleDateFormat("dd.MM.yyyy '-' HH:mm:ss'h'");
 		switch(value){
 		
 		case 0:
@@ -378,6 +543,8 @@ public class ProcessWindow extends JFrame {
 		case 2:
 			lblNewLabel_1.setForeground(Color.green);
 			lblNewLabel_1.setText("Tabela 01 criada!");
+			lblNewLabelTS_1.setForeground(Color.black);
+			lblNewLabelTS_1.setText(ft.format(date));
 			progressBar.setValue(6);
 			break;
 		case 3:
@@ -387,6 +554,8 @@ public class ProcessWindow extends JFrame {
 		case 4:
 			lblNewLabel_2.setForeground(Color.green);
 			lblNewLabel_2.setText("Tabela 02 criada!");
+			lblNewLabelTS_2.setForeground(Color.black);
+			lblNewLabelTS_2.setText(ft.format(date));
 			progressBar.setValue(12);
 			break;
 		case 5:
@@ -396,6 +565,8 @@ public class ProcessWindow extends JFrame {
 		case 6:
 			lblNewLabel_3.setForeground(Color.green);
 			lblNewLabel_3.setText("Tabela 03 criada!");
+			lblNewLabelTS_3.setForeground(Color.black);
+			lblNewLabelTS_3.setText(ft.format(date));
 			progressBar.setValue(18);
 			break;
 		case 7:
@@ -405,6 +576,8 @@ public class ProcessWindow extends JFrame {
 		case 8:
 			lblNewLabel_4.setForeground(Color.green);
 			lblNewLabel_4.setText("Tabela 04 criada!");
+			lblNewLabelTS_4.setForeground(Color.black);
+			lblNewLabelTS_4.setText(ft.format(date));
 			progressBar.setValue(24);
 			break;
 		case 9:
@@ -414,6 +587,8 @@ public class ProcessWindow extends JFrame {
 		case 10:
 			lblNewLabel_5.setForeground(Color.green);
 			lblNewLabel_5.setText("Tabelas 05 a 09 criadas!");
+			lblNewLabelTS_5.setForeground(Color.black);
+			lblNewLabelTS_5.setText(ft.format(date));
 			progressBar.setValue(54);
 			break;
 		case 11:
@@ -423,6 +598,8 @@ public class ProcessWindow extends JFrame {
 		case 12:
 			lblNewLabel_6.setForeground(Color.green);
 			lblNewLabel_6.setText("Tabelas 10.01 e 10.02 criadas!");
+			lblNewLabelTS_6.setForeground(Color.black);
+			lblNewLabelTS_6.setText(ft.format(date));
 			progressBar.setValue(68);
 			break;
 		case 13:
@@ -432,6 +609,8 @@ public class ProcessWindow extends JFrame {
 		case 14:
 			lblNewLabel_7.setForeground(Color.green);
 			lblNewLabel_7.setText("Tabelas 10.03 a 12 criadas!");
+			lblNewLabelTS_7.setForeground(Color.black);
+			lblNewLabelTS_7.setText(ft.format(date));
 			progressBar.setValue(86);
 			break;
 		case 15:
@@ -441,6 +620,8 @@ public class ProcessWindow extends JFrame {
 		case 16:
 			lblNewLabel_8.setForeground(Color.green);
 			lblNewLabel_8.setText("Tabela 13 criada!");
+			lblNewLabelTS_8.setForeground(Color.black);
+			lblNewLabelTS_8.setText(ft.format(date));
 			progressBar.setValue(92);
 			break;
 		case 17:
@@ -450,6 +631,8 @@ public class ProcessWindow extends JFrame {
 		case 18:
 			lblNewLabel_9.setForeground(Color.green);
 			lblNewLabel_9.setText("Tabela 14 criada!");
+			lblNewLabelTS_9.setForeground(Color.black);
+			lblNewLabelTS_9.setText(ft.format(date));
 			progressBar.setValue(95);
 			break;
 		case 19:
@@ -459,6 +642,8 @@ public class ProcessWindow extends JFrame {
 		case 20:
 			lblNewLabel_10.setForeground(Color.green);
 			lblNewLabel_10.setText("Tabela 15 criada!");
+			lblNewLabelTS_10.setForeground(Color.black);
+			lblNewLabelTS_10.setText(ft.format(date));
 			progressBar.setValue(97);
 			break;
 		case 21:
@@ -468,6 +653,30 @@ public class ProcessWindow extends JFrame {
 		case 22:
 			lblNewLabel_11.setForeground(Color.green);
 			lblNewLabel_11.setText("Tabela 16 criada!");
+			lblNewLabelTS_11.setForeground(Color.black);
+			lblNewLabelTS_11.setText(ft.format(date));
+			progressBar.setValue(100);
+			break;
+		case 23:
+			lblNewLabel_13.setForeground(Color.blue);
+			lblNewLabel_13.setText("Criando Tabela gephi_nodes...");
+			break;
+		case 24:
+			lblNewLabel_13.setForeground(Color.green);
+			lblNewLabel_13.setText("Tabela gephi_nodes criada!");
+			lblNewLabelTS_12.setForeground(Color.black);
+			lblNewLabelTS_12.setText(ft.format(date));
+			progressBar.setValue(100);
+			break;
+		case 25:
+			lblNewLabel_14.setForeground(Color.blue);
+			lblNewLabel_14.setText("Criando Tabela gephi_edges...");
+			break;
+		case 26:
+			lblNewLabel_14.setForeground(Color.green);
+			lblNewLabel_14.setText("Tabela gephi_edges criada!");
+			lblNewLabelTS_13.setForeground(Color.black);
+			lblNewLabelTS_13.setText(ft.format(date));
 			progressBar.setValue(100);
 			break;
 		default:
@@ -476,5 +685,4 @@ public class ProcessWindow extends JFrame {
 		
 		}
 	}
-
 }

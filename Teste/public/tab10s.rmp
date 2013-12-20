@@ -48,7 +48,7 @@
         <parameter key="add_meta_information" value="false"/>
         <parameter key="keep_text" value="false"/>
         <parameter key="prune_method" value="absolute"/>
-        <parameter key="prunde_below_percent" value="3.0"/>
+        <parameter key="prune_below_percent" value="3.0"/>
         <parameter key="prune_above_percent" value="30.0"/>
         <parameter key="prune_below_absolute" value="5"/>
         <parameter key="prune_above_absolute" value="9999999"/>

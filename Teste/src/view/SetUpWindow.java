@@ -1,6 +1,24 @@
+/*
+ * Data:
+ * Dezembro de 2013
+ * 
+ * Descricao:
+ * Programa de integracao de processos do Programa Rapid Miner, que compoem as etapas para a 
+ * geracao de resultados de similaridades e agrupamentos entre pesquisadores em determinado dominio.
+ * 
+ * Creditos:
+ * Processos Rapid Miner e processamentos de rotina SQL. 
+ * Romualdo Alves Pereira Júnior - romualdoalves@gmail.com
+ * 
+ * Programa de integracao dos processos e  elaboracao de interface grafica.
+ * Igor Pessoa Rocha - iprocha@gmail.com
+ * 
+ */
+
 package view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -16,11 +34,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import controller.ConnectionFactory;
-import controller.Dispatcher;
 
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 
+
+
 import java.awt.Component;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
+import java.lang.management.OperatingSystemMXBean;
+import java.sql.SQLException;
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -28,7 +53,9 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingWorker;
 import javax.swing.JComboBox;
 import javax.swing.SwingConstants;
+
 import java.awt.Font;
+
 import javax.swing.JSeparator;
 
 public class SetUpWindow extends JFrame {
@@ -42,7 +69,9 @@ public class SetUpWindow extends JFrame {
 	private JLabel labelTestaConexao;
 	private JLabel labelDominioResponse;
 	private JSpinner spinnerGrupos;
-	
+	private int numResearchers;
+	private JSpinner spinnerPruneBelow;
+	private JSpinner spinnerPruneAbove;
 	/**
 	 * Launch the application.
 	 */
@@ -52,6 +81,34 @@ public class SetUpWindow extends JFrame {
 				try {
 					SetUpWindow frame = new SetUpWindow();
 					frame.setVisible(true);
+					
+					/*
+					 * Teste para checar a memoria da JVM.
+					 * Ainda em desenvolvimento...
+					 * 
+					 */
+//					NumberFormat format = NumberFormat.getInstance();
+//					Runtime runtime = Runtime.getRuntime();
+//					StringBuilder sb = new StringBuilder();
+//					long maxMemory = runtime.maxMemory();
+//				    long allocatedMemory = runtime.totalMemory();
+//				    long freeMemory = runtime.freeMemory();
+//
+//				    sb.append("free memory: " + format.format(freeMemory / 1024) + "\n");
+//				    sb.append("allocated memory: " + format.format(allocatedMemory / 1024)+ "\n");
+//				    sb.append("max memory: " + format.format(maxMemory / 1024) + "\n" );
+//				    sb.append("total free memory: " + format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024) + "\n");
+//					System.out.println(sb);
+//					
+//					MemoryMXBean memBean = ManagementFactory.getMemoryMXBean();
+//					MemoryUsage heap = memBean.getHeapMemoryUsage();
+//					MemoryUsage nonheap = memBean.getNonHeapMemoryUsage();
+//					//System.out.println(memBean.toString());
+//					System.out.println(heap.toString());
+//					System.out.println(nonheap.toString());
+//					
+		
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -65,7 +122,7 @@ public class SetUpWindow extends JFrame {
 	public SetUpWindow() {
 		setTitle("Processer");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 571, 424);
+		setBounds(100, 100, 502, 507);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -87,14 +144,12 @@ public class SetUpWindow extends JFrame {
 		
 		
 		textFieldNomeBanco = new JTextField();
-		textFieldNomeBanco.setText("im_lattes");
 		textFieldNomeBanco.setBounds(142, 69, 122, 20);
 		contentPane.add(textFieldNomeBanco);
 		textFieldNomeBanco.setColumns(10);
 		
 		
 		textFieldUsuario = new JTextField();
-		textFieldUsuario.setText("desenvolvimento");
 		textFieldUsuario.setBounds(142, 100, 122, 20);
 		contentPane.add(textFieldUsuario);
 		textFieldUsuario.setColumns(10);
@@ -108,7 +163,6 @@ public class SetUpWindow extends JFrame {
 		contentPane.add(lblNewLabel_3);
 		
 		passwordFieldSenha = new JPasswordField();
-		passwordFieldSenha.setText("123456");
 		passwordFieldSenha.setBounds(142, 131, 122, 20);
 		contentPane.add(passwordFieldSenha);
 		
@@ -119,7 +173,7 @@ public class SetUpWindow extends JFrame {
 		contentPane.add(lblNmeroDeGrupos);
 		
 		spinnerGrupos = new JSpinner();
-		spinnerGrupos.setModel(new SpinnerNumberModel(new Integer(1), new Integer(1), null, new Integer(1)));
+		spinnerGrupos.setModel(new SpinnerNumberModel(new Integer(10), new Integer(2), null, new Integer(1)));
 		spinnerGrupos.setBounds(161, 294, 47, 20);
 		contentPane.add(spinnerGrupos);
 		
@@ -137,37 +191,69 @@ public class SetUpWindow extends JFrame {
 		btnNewButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				int numResearchers = ConnectionFactory.validateDomain(textFieldServidor.getText(),textFieldNomeBanco.getText(),textFieldUsuario.getText(),String.valueOf(passwordFieldSenha.getPassword()),textFieldDominio.getText());
+				try{
+				numResearchers = ConnectionFactory.validateDomain(textFieldServidor.getText(),textFieldNomeBanco.getText(),textFieldUsuario.getText(),String.valueOf(passwordFieldSenha.getPassword()),textFieldDominio.getText());
 				if (numResearchers > 0 ){
-					labelDominioResponse.setText("Existe(m) " + numResearchers + " pesquisador(es) no domínio escolhido.");
+					labelDominioResponse.setForeground(Color.black);
+					labelDominioResponse.setText(numResearchers + " Pesquisador(es)");
 				}
 				else{
+					labelDominioResponse.setForeground(Color.red);
 					labelDominioResponse.setText("Domínio inexistente.");
+				}
+				}catch(SQLException sqle){
+					labelDominioResponse.setForeground(Color.red);
+					labelDominioResponse.setText(sqle.toString());
+				}catch(Exception e){
+					labelDominioResponse.setForeground(Color.red);
+					labelDominioResponse.setText(e.toString());
+				}finally{
+					
 				}
 			}
 		});
 		btnNewButton.setBounds(10, 251, 141, 23);
 		contentPane.add(btnNewButton);
 		
-		//Handler que cuida do botao de executar
+		//Handler que cuida do botao de proximo
 		JButton btnNewButton_1 = new JButton("Pr\u00F3ximo");
 		btnNewButton_1.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				
+				//Valida o dominio para pegar o numero de pesquisadores e passar para a tela de Status do processamento
+				try{
+					numResearchers = ConnectionFactory.validateDomain(textFieldServidor.getText(),textFieldNomeBanco.getText(),textFieldUsuario.getText(),String.valueOf(passwordFieldSenha.getPassword()),textFieldDominio.getText());
+					if (numResearchers > 0 ){
+						labelDominioResponse.setForeground(Color.black);
+						labelDominioResponse.setText(numResearchers + " Pesquisador(es)");
+					}
+					else{
+						labelDominioResponse.setForeground(Color.red);
+						labelDominioResponse.setText("Domínio inexistente.");
+					}
+					}catch(SQLException sqle){
+						labelDominioResponse.setForeground(Color.red);
+						labelDominioResponse.setText(sqle.toString());
+					}catch(Exception e){
+						labelDominioResponse.setForeground(Color.red);
+						labelDominioResponse.setText(e.toString());
+					}finally{
+						
+					}
 				
-				ProcessWindow frame = new ProcessWindow(textFieldServidor.getText(),textFieldNomeBanco.getText(),textFieldUsuario.getText(),String.valueOf(passwordFieldSenha.getPassword()),textFieldDominio.getText(),(Integer)spinnerGrupos.getValue());
+				//Chama a tela de status do processamento (ProcessWindow) passando os devidos parametros.
+				ProcessWindow frame = new ProcessWindow(textFieldServidor.getText(),textFieldNomeBanco.getText(),textFieldUsuario.getText(),String.valueOf(passwordFieldSenha.getPassword()),textFieldDominio.getText(),(Integer)spinnerGrupos.getValue(),numResearchers,(Integer)spinnerPruneBelow.getValue(),(Integer)spinnerPruneAbove.getValue());
 				frame.setVisible(true);
-				//Dispatcher.executeWindow(textFieldServidor.getText(),textFieldNomeBanco.getText(),textFieldUsuario.getText(),String.valueOf(passwordFieldSenha.getPassword()),textFieldDominio.getText(),(Integer)spinnerGrupos.getValue());
-			
+				
 				
 			}
 		});
-		btnNewButton_1.setBounds(309, 340, 89, 23);
+		btnNewButton_1.setBounds(218, 435, 89, 23);
 		contentPane.add(btnNewButton_1);
 		
 		labelTestaConexao = new JLabel("");
-		labelTestaConexao.setBounds(162, 166, 309, 14);
+		labelTestaConexao.setBounds(162, 166, 383, 14);
 		contentPane.add(labelTestaConexao);
 		
 		//Handler que cuida do botao de testar conexao
@@ -175,28 +261,27 @@ public class SetUpWindow extends JFrame {
 		btnTestarConexao.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				if(ConnectionFactory.testConnection(textFieldServidor.getText(),textFieldNomeBanco.getText(),textFieldUsuario.getText(),String.valueOf(passwordFieldSenha.getPassword()))){
-					labelTestaConexao.setText("Conectou-se ao banco de dados com sucesso!");
+				try{
+					if(ConnectionFactory.testConnection(textFieldServidor.getText(),textFieldNomeBanco.getText(),textFieldUsuario.getText(),String.valueOf(passwordFieldSenha.getPassword()))){
+						labelTestaConexao.setForeground(Color.GREEN);
+						labelTestaConexao.setText("Conectou-se ao banco de dados com sucesso!");
+					}
+				}catch(SQLException sqle){
+					labelTestaConexao.setForeground(Color.red);
+					labelTestaConexao.setText(sqle.toString());
+				}catch(Exception e){
+					labelTestaConexao.setForeground(Color.red);
+					labelTestaConexao.setText(e.toString());
 				}
-				else{
-					labelTestaConexao.setText("Conexão não estabelecida!");
-				}
+				
 			}
 		});
 		btnTestarConexao.setBounds(10, 162, 141, 23);
 		contentPane.add(btnTestarConexao);
 		
 		labelDominioResponse = new JLabel("");
-		labelDominioResponse.setBounds(243, 226, 271, 14);
+		labelDominioResponse.setBounds(218, 226, 327, 14);
 		contentPane.add(labelDominioResponse);
-		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setBounds(335, 80, 136, 20);
-		contentPane.add(comboBox);
-		
-		JButton btnSalvarConexo = new JButton("Salvar Conex\u00E3o");
-		btnSalvarConexo.setBounds(335, 50, 133, 23);
-		contentPane.add(btnSalvarConexo);
 		
 		JLabel lblConfiguraoDoProcessemento = new JLabel("Configura\u00E7\u00E3o");
 		lblConfiguraoDoProcessemento.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -207,6 +292,24 @@ public class SetUpWindow extends JFrame {
 		JSeparator separator = new JSeparator();
 		separator.setBounds(10, 196, 466, 2);
 		contentPane.add(separator);
+		
+		JLabel lblLabelPruneBelow = new JLabel("Corte Inferior:");
+		lblLabelPruneBelow.setBounds(10, 330, 122, 14);
+		contentPane.add(lblLabelPruneBelow);
+		
+		JLabel lblLabePruneAbove = new JLabel("Corte Superior:");
+		lblLabePruneAbove.setBounds(10, 362, 122, 14);
+		contentPane.add(lblLabePruneAbove);
+		
+		spinnerPruneBelow = new JSpinner();
+		spinnerPruneBelow.setModel(new SpinnerNumberModel(new Integer(5), new Integer(1), null, new Integer(1)));
+		spinnerPruneBelow.setBounds(161, 327, 47, 20);
+		contentPane.add(spinnerPruneBelow);
+		
+		spinnerPruneAbove = new JSpinner();
+		spinnerPruneAbove.setModel(new SpinnerNumberModel(new Integer(5), new Integer(1), null, new Integer(1)));
+		spinnerPruneAbove.setBounds(161, 359, 47, 20);
+		contentPane.add(spinnerPruneAbove);
 		contentPane.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{textFieldServidor, textFieldNomeBanco, textFieldUsuario, passwordFieldSenha, lblNewLabel, btnTestarConexao, textFieldDominio, btnNewButton, spinnerGrupos, btnNewButton_1, lblNewLabel_1, lblNewLabel_2, lblNewLabel_3, lblNmeroDeGrupos, lblNewLabel_4, labelTestaConexao, labelDominioResponse}));
 	}
 }
