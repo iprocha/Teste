@@ -80,6 +80,7 @@ public class SetUpWindow extends JFrame {
 			public void run() {
 				try {
 					SetUpWindow frame = new SetUpWindow();
+					frame.setResizable(false);
 					frame.setVisible(true);
 					
 					/*
@@ -244,6 +245,7 @@ public class SetUpWindow extends JFrame {
 				
 				//Chama a tela de status do processamento (ProcessWindow) passando os devidos parametros.
 				ProcessWindow frame = new ProcessWindow(textFieldServidor.getText(),textFieldNomeBanco.getText(),textFieldUsuario.getText(),String.valueOf(passwordFieldSenha.getPassword()),textFieldDominio.getText(),(Integer)spinnerGrupos.getValue(),numResearchers,(Integer)spinnerPruneBelow.getValue(),(Integer)spinnerPruneAbove.getValue());
+				frame.setResizable(false);
 				frame.setVisible(true);
 				
 				

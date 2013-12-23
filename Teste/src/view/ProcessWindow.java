@@ -124,6 +124,7 @@ public class ProcessWindow extends JFrame {
 	public ProcessWindow(String serverArg, String schemaArg, String userArg, String passwordArg, String domainArg, int kNumberArg, int numResearchersArg, int pruneBelowArg, int pruneAboveArg) {
 		setTitle("Processer");
 		
+		
 		this.server = serverArg;
 		this.schema = schemaArg;
 		this.user = userArg;
